@@ -12,19 +12,24 @@ export class ProductService {
         return products
     }
 
+    async getProductById(id: string): Promise<Product | undefined> {
+        return products.find(product => product.id === id)
+    }
+
     async updateProduct(id: string, updatedProduct: Partial<Product>): Promise<Product | undefined> {
-        const productIdx = products.findIndex(product => product.id === id)
-        if (productIdx === -1) return undefined
+        const product = await this.getProductById(id)
+        if (!product) return undefined
         
-        products[productIdx] = { ...products[productIdx], ...updatedProduct }
+        Object.assign(product, updatedProduct)
         
-        return products[productIdx]
+        return product
     }
 
     async deleteProduct(id: string): Promise<boolean> {
-        const productIdx = products.findIndex(product => product.id === id)
-        if (productIdx === -1) return false
+        const product = await this.getProductById(id)
+        if (!product) return false
 
+        const productIdx = products.indexOf(product)
         products.splice(productIdx, 1)
 
         return true
